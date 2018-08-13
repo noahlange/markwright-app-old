@@ -1,29 +1,36 @@
 import * as React from 'react';
 import { basename } from 'path';
 import * as Sass from 'sass.js/dist/sass.js';
-import { debounce } from 'lodash-decorators';
 import { autobind } from 'core-decorators';
 
 import { ipcRenderer as ipc } from 'electron';
 import { readFileSync, writeFileSync } from 'fs';
 import * as WebView from 'react-electron-web-view';
 import { parse } from 'jsonc-parser';
-import Editor from './editor';
+import Editor, { ContentType } from './editor';
 
-export default class App extends React.Component<any, any> {
+type AppState = {
+  current: string;
+  initial: Record<ContentType, string>;
+  content: Record<ContentType & 'css', string>;
+  error: boolean;
+  errorText: string;
+}
+
+export default class App extends React.Component<any, AppState> {
   protected _read: boolean = false;
 
   public preview: WebView;
   public state = {
     current: 'Untitled.mw',
     initial: {
-      scss: '',
+      styles: '',
       metadata: '{}',
-      markdown: ''
+      content: ''
     },
     content: {
-      scss: '',
-      markdown: '',
+      styles: '',
+      content: '',
       metadata: '',
       css: ''
     },
@@ -70,55 +77,66 @@ export default class App extends React.Component<any, any> {
           initial: JSON.parse(readFileSync(file, 'utf8'))
         },
         () => {
-          this.onChange('markdown', this.state.initial.markdown);
-          this.onChange('scss', this.state.initial.scss);
+          this.onChange('content', this.state.initial.content);
+          this.onChange('metadata', this.state.initial.metadata);
+          this.onChange('styles', this.state.initial.styles);
         }
       );
     });
   }
 
-  @debounce(250)
   @autobind
-  public onChange(key, value) {
-    if (key === 'metadata') {
-      try {
-        const data = parse(value);
-        this.setState({ content: { ...this.state.content, metadata: value }}, () => {
-          this.preview.send('editor.metadata', data);
-        })
-      } catch (e) {
-        console.warn('bad metadata');
-      }
-    } else if (key === 'markdown') {
-      this.setState(
-        {
-          content: {
-            ...this.state.content,
-            markdown: value
-          },
-          error: false
-        },
-        () => {
-          this.preview.send('editor.markdown', value);
-        }
-      );
-    } else if (key === 'scss') {
-      this.sass(value)
-        .then(result => {
+  public onMouseOver() {
+    this.preview.focus();
+  }
+
+  @autobind
+  public onChange(key: ContentType, value) {
+    switch (key) {
+      case 'metadata':
+        try {
+          const data = parse(value);
           this.setState(
-            {
-              content: {
-                ...this.state.content,
-                scss: value,
-                css: result
-              }
-            },
+            { content: { ...this.state.content, metadata: value } },
             () => {
-              this.preview.send('editor.css', result);
+              this.preview.send('editor.metadata', data);
             }
           );
-        })
-        .catch(e => console.warn(e));
+        } catch (e) {
+          console.warn('bad metadata');
+        }
+        break;
+      case 'content':
+        this.setState(
+          {
+            content: {
+              ...this.state.content,
+              markdown: value
+            },
+            error: false
+          },
+          () => {
+            this.preview.send('editor.markdown', value);
+          }
+        );
+        break;
+      case 'styles':
+        this.sass(value)
+          .then(result => {
+            this.setState(
+              {
+                content: {
+                  ...this.state.content,
+                  scss: value,
+                  css: result
+                }
+              },
+              () => {
+                this.preview.send('editor.css', result);
+              }
+            );
+          })
+          .catch(e => console.warn(e));
     }
   }
 
@@ -130,7 +148,7 @@ export default class App extends React.Component<any, any> {
             <header>{this.state.current}</header>
             <Editor initial={this.initial} onChange={this.onChange} />
           </div>
-          <div className="preview">
+          <div className="preview" onMouseOver={this.onMouseOver}>
             {this.state.error ? (
               <div className="bbod">
                 <div>

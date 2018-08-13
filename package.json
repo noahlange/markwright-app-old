@@ -2,8 +2,8 @@
   "name": "Markwright",
   "private": true,
   "license": "MIT",
-  "description": "Rich document layout in Markdown and SCSS.",
-  "version": "1.1.0",
+  "description": "Bares-bones DTP in Markdown and SCSS.",
+  "version": "1.2.0",
   "author": "Noah Lange <noahrlange@gmail.com>",
   "dependencies": {
     "change-case": "^3.0.1",
@@ -18,6 +18,7 @@
     "lodash-decorators": "^5.0.0",
     "markwright": "noahlange/markwright",
     "monaco-editor": "^0.14.2",
+    "paper-size": "^1.1.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-electron-web-view": "^2.0.1",

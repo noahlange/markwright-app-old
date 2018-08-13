@@ -1,14 +1,10 @@
-![Homebrewery](assets/icon.png)
 
-# Homebrewery Electron
-[stolksdorf's](https://github.com/stolksdorf) Homebrewery app, on your desktop,
-with some twists.
-
-![Homebrewery Desktop](https://i.imgur.com/XXw3gJb.jpg)
+# Markwright
+Bare-bones DTP with Markdown and SASS.
 
 ```
-git clone https://github.com/noahlange/homebrewery-electron.git
-cd homebrewery-electron
+git clone https://github.com/noahlange/markwright-app.git
+cd markwright-app
 yarn
 yarn build
 yarn start
@@ -17,8 +13,8 @@ yarn start
 If you're using NPM, the installation process is nearly identical.
 
 ```
-git clone https://github.com/noahlange/homebrewery-electron.git
-cd homebrewery-electron
+git clone https://github.com/noahlange/markwright-app.git
+cd markwright-app
 npm install
 npm run build
 npm run start
