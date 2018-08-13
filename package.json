@@ -16,13 +16,15 @@
     "jsonc-parser": "^2.0.1",
     "lodash": "^4.17.10",
     "lodash-decorators": "^5.0.0",
-    "markwright": "^0.3.1",
+    "markwright": "noahlange/markwright",
     "monaco-editor": "^0.14.2",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-electron-web-view": "^2.0.1",
     "react-monaco-editor": "^0.17.2",
+    "react-promise": "^2.0.3",
     "sass.js": "^0.10.10",
+    "simple-markdown": "^0.4.1",
     "workly": "^1.0.1"
   },
   "devDependencies": {
