@@ -1,8 +1,7 @@
 dist
 lib
 node_modules
-assets/themes/5e
-assets/themes/pathfinder
+assets/themes
 *.map
 .sass-cache
 yarn.lock

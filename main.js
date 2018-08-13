@@ -1,4 +1,4 @@
-const { dialog, Menu, MenuItem, ipcMain, shell } = require('electron');
+const { dialog, webContents, Menu, MenuItem, ipcMain, shell } = require('electron');
 const { writeFileSync, readdirSync, mkdirSync } = require('fs');
 const { title } = require('change-case');
 const path = require('path');
@@ -9,12 +9,15 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const url = require('url');
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let current;
 
 function makeMenu() {
+  const saveOpts = {
+    filters: [
+      { name: 'Markwright', extensions: [ 'mw', 'markwright' ] }
+    ]
+  };
   return [
     {
       label: app.getName(),
@@ -53,7 +56,7 @@ function makeMenu() {
             if (current) {
               mainWindow.webContents.send('save', current);
             } else {
-              const file = dialog.showSaveDialog();
+              const file = dialog.showSaveDialog(saveOpts);
               if (file) {
                 current = file;
                 mainWindow.webContents.send('save', file);
@@ -66,7 +69,7 @@ function makeMenu() {
           role: 'save-as',
           accelerator: 'Cmd+Shift+S',
           click: () => {
-            const file = dialog.showSaveDialog();
+            const file = dialog.showSaveDialog(saveOpts);
             if (file) {
               mainWindow.webContents.send('save', file);
               current = file;
@@ -78,9 +81,14 @@ function makeMenu() {
           role: 'print',
           accelerator: 'Cmd+Shift+E',
           click() {
-            const file = dialog.showSaveDialog();
+            const file = dialog.showSaveDialog({
+              filters: [
+                { name: 'PDF', extensions: [ 'pdf' ] }
+              ]
+            });
             if (file) {
-              mainWindow.webContents.printToPDF(
+              const wc = webContents.getAllWebContents().shift();
+              wc.printToPDF(
                 {
                   marginsType: 1,
                   printBackground: true,
@@ -144,7 +152,8 @@ function createWindow() {
     width: 1680,
     height: 1050,
     minWidth: 1280,
-    titleBarStyle: 'hidden'
+    titleBarStyle: 'hidden',
+    vibrancy: 'dark'
   });
 
   setMenu();

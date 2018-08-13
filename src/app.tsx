@@ -1,76 +1,151 @@
 import * as React from 'react';
-import * as fm from 'front-matter';
+import { basename } from 'path';
+import * as Sass from 'sass.js/dist/sass.js';
+import { debounce } from 'lodash-decorators';
 import { autobind } from 'core-decorators';
-import { debounce, throttle } from 'lodash-decorators';
 
 import { ipcRenderer as ipc } from 'electron';
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
 import * as WebView from 'react-electron-web-view';
+import { parse } from 'jsonc-parser';
 import Editor from './editor';
 
 export default class App extends React.Component<any, any> {
+  protected _read: boolean = false;
+
   public preview: WebView;
   public state = {
-    value: '',
-    theme: 'markwright',
-    themes: ['markwright'],
-    noSuchTheme: false,
-    noSuchThemeName: ''
+    current: 'Untitled.mw',
+    initial: {
+      scss: '',
+      metadata: '{}',
+      markdown: ''
+    },
+    content: {
+      scss: '',
+      markdown: '',
+      metadata: '',
+      css: ''
+    },
+    error: false,
+    errorText: ''
+  };
+
+  public get initial() {
+    if (!this._read) {
+      this._read = true;
+      return this.state.initial;
+    } else {
+      return null;
+    }
+  }
+
+  public sass = str => {
+    return new Promise((resolve, reject) => {
+      const scss = new Sass();
+      scss.compile(str, res => {
+        res.status ? reject(res.message) : resolve(res.text);
+      });
+    });
   };
 
   public componentDidMount() {
+    Sass.setWorkerUrl('../node_modules/sass.js/dist/sass.worker.js');
     this.preview = document.querySelector('webview');
-    ipc.on('save', (e, file) => writeFileSync(file, this.state.value, 'utf8'));
-    ipc.on('open', (e, file) =>
-      this.setState({ value: readFileSync(file, 'utf8') })
-    );
 
-    const paths = readdirSync(resolve(__dirname, '../assets/themes'));
-    this.setState({ themes: paths.filter(f => !f.startsWith('.')) });
+    ipc.on('save', (e, file) => {
+      try {
+        this.setState({ current: basename(file) });
+        writeFileSync(file, JSON.stringify(this.state.content), 'utf8');
+      } catch (e) {
+        console.warn(e);
+      }
+    });
+
+    ipc.on('open', (e, file) => {
+      this._read = false;
+      this.setState(
+        {
+          current: basename(file),
+          initial: JSON.parse(readFileSync(file, 'utf8'))
+        },
+        () => {
+          this.onChange('markdown', this.state.initial.markdown);
+          this.onChange('scss', this.state.initial.scss);
+        }
+      );
+    });
   }
 
-  @debounce(200)
+  @debounce(250)
   @autobind
-  public onChange(value, e) {
-    const { attributes, body } = fm(value);
-    this.setState({ value }, this.preview.send('editor.change', body));
-    this.preview.send('editor.variant', attributes.variant || '');
-    if (attributes.theme) {
-      if (this.state.themes.includes(attributes.theme)) {
-        this.setState({ theme: attributes.theme, noSuchTheme: false });
-        this.preview.send('editor.theme', attributes.theme);
-      } else {
-        this.setState({ noSuchTheme: true, noSuchThemeName: attributes.theme });
+  public onChange(key, value) {
+    if (key === 'metadata') {
+      try {
+        const data = parse(value);
+        this.setState({ content: { ...this.state.content, metadata: value }}, () => {
+          this.preview.send('editor.metadata', data);
+        })
+      } catch (e) {
+        console.warn('bad metadata');
       }
-    } else if (this.state.theme !== 'markwright') {
-      this.setState({ theme: 'markwright', noSuchTheme: false });
-      this.preview.send('editor.theme', 'markwright');
+    } else if (key === 'markdown') {
+      this.setState(
+        {
+          content: {
+            ...this.state.content,
+            markdown: value
+          },
+          error: false
+        },
+        () => {
+          this.preview.send('editor.markdown', value);
+        }
+      );
+    } else if (key === 'scss') {
+      this.sass(value)
+        .then(result => {
+          this.setState(
+            {
+              content: {
+                ...this.state.content,
+                scss: value,
+                css: result
+              }
+            },
+            () => {
+              this.preview.send('editor.css', result);
+            }
+          );
+        })
+        .catch(e => console.warn(e));
     }
   }
 
   public render() {
     return (
-      <div className="flex">
-        <div className="editor">
-          <Editor onChange={this.onChange} value={this.state.value} />
-        </div>
-        <div className="preview">
-          { this.state.noSuchTheme
-            ? <div className="bbod">
-              <div>
-                <h2>Additional theme required!</h2>
-                <p>The theme "{ this.state.noSuchThemeName }" was not found in the application's "assets/themes" directory. You should probably download it if you want to use it.</p>
+      <div>
+        <div className="flex">
+          <div className="editor">
+            <header>{this.state.current}</header>
+            <Editor initial={this.initial} onChange={this.onChange} />
+          </div>
+          <div className="preview">
+            {this.state.error ? (
+              <div className="bbod">
+                <div>
+                  <h2>Error!</h2>
+                  <p>{this.state.errorText}</p>
+                </div>
               </div>
-            </div>
-            : null
-          }
-          <WebView
-            autosize
-            nodeintegration
-            blinkfeatures="OverlayScrollbars"
-            src={resolve(__dirname, '../public/preview.html')}
-          />
+            ) : null}
+            <WebView
+              autosize
+              nodeintegration
+              blinkfeatures="OverlayScrollbars"
+              src={'preview.html'}
+            />
+          </div>
         </div>
       </div>
     );

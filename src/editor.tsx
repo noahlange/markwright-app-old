@@ -1,39 +1,126 @@
 import * as React from 'react';
+import * as monaco from 'monaco-editor';
 import MonacoEditor from 'react-monaco-editor';
-import { resolve } from 'path';
 
-export default class Editor extends React.Component<any, any> {
+monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+  allowComments: true
+});
 
-  public editor;
-  public state = {
-    value: this.props.value,
-    loading: true
+(window as any).MonacoEnvironment = {
+  getWorkerUrl: function(_, label) {
+    if (label === 'scss') {
+      return '../lib/css.worker.js';
+    }
+    if (label === 'json') {
+      return '../lib/json.worker.js';
+    }
+    return '../lib/editor.worker.js';
+  }
+};
+
+type EditorState = {
+  content: {
+    markdown: string;
+    metadata: string;
+    scss: string;
   };
+  tab: 'markdown' | 'scss' | 'metadata';
+  loaded: boolean;
+};
 
-  public editorDidMount(editor, monaco) {
-    this.editor = editor;
-    this.editor.focus();
-    this.setState({ loading: false });
+export default class Editor extends React.Component<any, EditorState> {
+  public static getDerivedStateFromProps(props) {
+    return props.initial ? { content: props.initial } : {};
   }
 
-	public handleResize = () => this.editor.layout();
-  
+  public editor = null;
+
+  public state: EditorState = {
+    content: {
+      scss: '',
+      metadata: '',
+      markdown: ''
+    },
+    tab: 'markdown',
+    loaded: false
+  };
+
+  public onChange = e => {
+    this.setState(
+      {
+        content: {
+          ...this.state.content,
+          [this.state.tab]: e
+        }
+      },
+      () => {
+        this.props.onChange(this.state.tab, e);
+      }
+    );
+  };
+
+  public editorDidMount = editor => {
+    editor.getModel().updateOptions({
+      tabSize: 2
+    });
+    this.editor = editor;
+    this.editor.focus();
+    this.editor.layout();
+    this.setState({ loaded: true });
+  };
+
+  public handleResize = () => this.editor.layout();
+
   public componentDidMount() {
+    const tabs: any[] = ['markdown', 'scss', 'metadata'];
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('keypress', e => {
+      if (e.ctrlKey && e.code === 'Tab') {
+        const idx = (tabs.indexOf(this.state.tab) + 1) % 3;
+        this.setState({ tab: tabs[idx - 1] });
+      }
+    });
   }
 
   public render() {
     return (
-      <div className={ this.state.loading ? 'spinner' : '' }>
+      <div
+        id="monaco-container"
+        className={this.state.loaded ? '' : 'spinner'}
+        style={{ width: 'calc(100vw - 8.5in - 2rem' }}
+      >
+        <div className={`tabs ${this.state.tab}`}>
+          <button
+            className="markdown"
+            onClick={() => this.setState({ tab: 'markdown' })}
+          >
+            Markdown
+          </button>
+          <button
+            className="scss"
+            onClick={() => this.setState({ tab: 'scss' })}
+          >
+            SCSS
+          </button>
+          <button
+            className="metadata"
+            onClick={() => this.setState({ tab: 'metadata' })}
+          >
+            Metadata
+          </button>
+        </div>
         <MonacoEditor
-          width="calc(100vw - 8.5in - 2rem)"
-          height="1050"
-          theme="vs-dark"
-          language="markdown"
-          options={ { wordWrap: true, fontFamily: 'Inconsolata', fontSize: 15 } }
-          onChange={ this.props.onChange }
-          editorDidMount={ (e, m) => this.editorDidMount(e, m) }
-          value={ this.props.value }
+          theme="vs-light"
+          language={this.state.tab === 'metadata' ? 'json' : this.state.tab}
+          options={{
+            wordWrap: 'bounded',
+            fontFamily: 'Fira Code',
+            fontLigatures: true,
+            fontSize: 15
+          }}
+          onChange={this.onChange}
+          editorDidMount={this.editorDidMount}
+          value={this.state.content[this.state.tab]}
         />
       </div>
     );
