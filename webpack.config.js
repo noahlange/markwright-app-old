@@ -1,5 +1,5 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const externals = require('webpack-node-externals');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -14,7 +14,9 @@ module.exports = {
     })
   ],
   entry: {
-    bundle: './src/index.tsx'
+    editor: './src/entry/editor.tsx',
+    preview: './src/entry/preview.tsx',
+    highlight: './src/entry/highlight.ts'
   },
   output: {
     path: path.resolve(__dirname, './lib'),
@@ -36,11 +38,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ]
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js', '.json']
   }
 };

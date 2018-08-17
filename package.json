@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "description": "Bares-bones DTP in Markdown and SCSS.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "Noah Lange <noahrlange@gmail.com>",
   "dependencies": {
     "change-case": "^3.0.1",
@@ -12,6 +12,7 @@
     "firacode": "^1.205.0",
     "front-matter": "^2.3.0",
     "gray-matter": "^4.0.1",
+    "hercule": "^4.1.1",
     "js-cache": "^1.0.3",
     "jsonc-parser": "^2.0.1",
     "lodash": "^4.17.10",
@@ -19,23 +20,25 @@
     "markwright": "noahlange/markwright",
     "monaco-editor": "^0.14.2",
     "paper-size": "^1.1.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
     "react-electron-web-view": "^2.0.1",
     "react-monaco-editor": "^0.17.2",
+    "react-mosaic-component": "^1.1.1",
     "react-promise": "^2.0.3",
+    "react-virtualized": "^9.20.1",
     "sass.js": "^0.10.10",
     "simple-markdown": "^0.4.1",
+    "stream-to-string": "^1.1.0",
     "workly": "^1.0.1"
   },
   "devDependencies": {
     "@types/react": "^16.0.21",
     "css-loader": "^1.0.0",
-    "electron": "^2.0.7",
+    "electron": "^3.0.0-beta.5",
     "electron-builder": "^19.45.4",
-    "electron-rebuild": "^1.8.2",
-    "mini-css-extract-plugin": "^0.4.1",
     "monaco-editor-webpack-plugin": "^1.5.1",
+    "prettier": "^1.14.2",
     "style-loader": "^0.22.1",
     "ts-loader": "^4.4.2",
     "typescript": "^2.6.1",
@@ -45,10 +48,14 @@
   },
   "main": "main.js",
   "scripts": {
-    "release": "npm run build && build",
+    "dist": "npm run build && build",
     "start": "electron .",
     "build": "webpack --mode production",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "pretty": "prettier --write 'src/**/*'"
+  },
+  "prettier": {
+    "singleQuote": true
   },
   "build": {
     "appId": "com.noahlange.markwright",
@@ -56,8 +63,14 @@
     "directories": {
       "output": "dist"
     },
+    "fileAssociations": {
+      "ext": "mw",
+      "name": "Markwright document",
+      "icon": "assets/file_icon.icns"
+    },
     "files": [
       "assets",
+      "static",
       "lib",
       "node_modules",
       "main.js",
@@ -65,13 +78,9 @@
       "package.json"
     ],
     "mac": {
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.developer-tools",
       "target": "dmg"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
     }
   }
 }

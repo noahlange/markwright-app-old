@@ -1,22 +1,23 @@
-const { dialog, webContents, Menu, MenuItem, ipcMain, shell } = require('electron');
-const { writeFileSync, readdirSync, mkdirSync } = require('fs');
-const { title } = require('change-case');
+// @ts-nocheck
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  webContents,
+  Menu
+} = require('electron');
+const { writeFileSync } = require('fs');
 const path = require('path');
-const electron = require('electron');
-const Store = require('electron-store');
-const store = new Store();
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
 const url = require('url');
 
 let mainWindow;
 let current;
+let ready = false;
 
 function makeMenu() {
   const saveOpts = {
-    filters: [
-      { name: 'Markwright', extensions: [ 'mw', 'markwright' ] }
-    ]
+    filters: [{ name: 'Markwright', extensions: ['mw', 'markwright'] }]
   };
   return [
     {
@@ -44,7 +45,7 @@ function makeMenu() {
             const files = dialog.showOpenDialog({ properties: ['openFile'] });
             if (files) {
               current = files[0];
-              mainWindow.webContents.send('open', files[0]);
+              mainWindow.webContents.send('open', current);
             }
           }
         },
@@ -82,9 +83,7 @@ function makeMenu() {
           accelerator: 'Cmd+Shift+E',
           click() {
             const file = dialog.showSaveDialog({
-              filters: [
-                { name: 'PDF', extensions: [ 'pdf' ] }
-              ]
+              filters: [{ name: 'PDF', extensions: ['pdf'] }]
             });
             if (file) {
               const wc = webContents.getAllWebContents().shift();
@@ -136,17 +135,10 @@ function makeMenu() {
       role: 'window',
       submenu: [{ role: 'minimize' }, { role: 'close' }]
     }
-  ]
-}
-
-
-function setMenu() {
-  const menu = Menu.buildFromTemplate(makeMenu());
-  Menu.setApplicationMenu(menu);
+  ];
 }
 
 function createWindow() {
-
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1680,
@@ -156,7 +148,7 @@ function createWindow() {
     vibrancy: 'dark'
   });
 
-  setMenu();
+  Menu.setApplicationMenu(Menu.buildFromTemplate(makeMenu()));
   // and load the index.html of the app.
   mainWindow.loadURL(
     url.format({
@@ -166,8 +158,8 @@ function createWindow() {
     })
   );
 
-  // Emitted when the window is closed.
   mainWindow.on('closed', function() {
+    console.info('???');
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -175,12 +167,30 @@ function createWindow() {
   });
 }
 
+app.on('open-file', (e, path) => {
+  e.preventDefault();
+  ipcMain.once('app.ready', () => {
+    ready = true;
+    mainWindow.webContents.send('open', path);
+  });
+  if (ready) {
+    mainWindow.webContents.send('open', path);
+  }
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
 
-// Quit when all windows are closed.
+app.on('activate', function() {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
+
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q

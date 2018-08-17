@@ -1,10 +1,3 @@
-import * as sizes from 'paper-size';
-
-sizes.register('letter', 216, 279);
-sizes.register('legal', 216, 356);
-sizes.register('tabloid', 279, 432);
-sizes.register('half-letter', 140, 216);
-
 const options = [
   'a0',
   'a1',
@@ -50,7 +43,7 @@ export const schema = {
   properties: {
     columns: {
       title: 'Column count',
-      default: 2,
+      default: 1,
       type: 'integer'
     },
     manual: {
@@ -68,25 +61,22 @@ export const schema = {
 };
 
 export const defaults = {
-  columns: 2,
+  columns: 1,
   paper: 'letter'
 };
 
-export function styles(metadata) {
+export function styles(metadata, width: number, height: number) {
   const o = Object.assign(defaults, metadata);
-  const [width, height] = sizes.getSize(
-    options.includes(o.paper) ? o.paper : 'letter',
-    { unit: 'inches' }
-  );
 
-  const marginInner = 0.375;
-  const marginOuter = 0.625;
+  const marginInner = 1;
+  const marginOuter = 1;
   const marginTop = 1;
   const marginBottom = 1;
   const gutter = 0.5;
   const innerWidth = width - marginInner - marginOuter;
 
   return `
+
     :root {
       --page-width: ${width}in;
       --page-height: ${height}in;
@@ -94,13 +84,13 @@ export function styles(metadata) {
       --inner-width: ${innerWidth}in;
     
       --col-width: ${(innerWidth - (o.columns - 1) * gutter) / o.columns}in;
-      --col-height: ${height - marginTop - marginBottom}in;
+      --col-height: calc(${height - marginTop - marginBottom}in - 2rem);
       --col-gutter: ${gutter}in;
 
       --margin-inner: ${marginInner}in;
       --margin-outer: ${marginOuter}in;
-      --margin-top: ${marginTop / 2}in;
-      --margin-bottom: ${marginBottom / 2}in;
+      --margin-top: calc(${marginTop / 2}in - 0.5rem);
+      --margin-bottom: calc(${marginBottom / 2}in - 0.5rem);
     
       --grey-light: #efefef;
     
@@ -112,26 +102,24 @@ export function styles(metadata) {
       --font-heading: var(--font-sans);
       --font-title: var(--font-sans);
     }
-    
-    body {
+
+    html, body {
+      padding: 0;
       margin: 0;
-    }
-    
-    .mw {
-      display: table;
-      clear: both;
-      font-family: var(--font-sans);
-      width: var(--page-width);
-      height: var(--page-height);
-      font-size: 13px;
     }
     
     .section {
       display: flex;
       flex-direction: column;
     }
+
+    .section > div {
+      outline: none;
+    }
     
     .page {
+      font-family: var(--font-sans);
+      font-size: 15px;
       overflow: hidden;
       position: relative;
       display: flex;
@@ -156,7 +144,14 @@ export function styles(metadata) {
     
     .header {
       height: 1rem;
-      margin: var(--margin-top) 0;
+      margin-top: var(--margin-top);
+      margin-bottom: var(--margin-top);
+    }
+    
+    .pagination {
+      height: 1rem;
+      margin-top: var(--margin-bottom);
+      margin-bottom: var(--margin-bottom);
     }
     
     .body {
@@ -166,12 +161,6 @@ export function styles(metadata) {
       width: var(--inner-width);
       flex-basis: var(--col-height);
     }
-    
-    .pagination {
-      height: 1rem;
-      margin: var(--margin-bottom) 0;
-    }
-    
     .even .header,
     .even .pagination {
       text-align: right;
@@ -230,11 +219,8 @@ export function styles(metadata) {
     @media screen {
       .page {
         border-radius: 3px;
-        border: 1px solid #efefef;
-        margin: 1rem;
         background-color: white;
       }
     }
-    
   `;
 }

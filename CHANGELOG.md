@@ -1,5 +1,12 @@
 # The Homebrewery
 
+## 1.3.0
+  - new application icon / .mw document icon
+  - adjustable editor / preview panes
+  - built-in highlight.js theme
+  - file transclusion with hercule
+  - dependency updates
+
 ## 1.2.0
   - adds SCSS + JSON editor modes
   - adds Ctrl + Tab through editor modes

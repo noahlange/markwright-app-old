@@ -1,32 +1,47 @@
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { autobind } from 'core-decorators';
-import { debounce } from 'lodash-decorators';
-import { schema } from './themes/markwright';
+import { debounce, throttle } from 'lodash-decorators';
+
+import { schema } from '../themes/markwright';
 
 (window as any).MonacoEnvironment = {
-  getWorkerUrl: function(_, label) {
-    if (label === 'scss') {
-      return '../lib/css.worker.js';
+  getWorkerUrl(_, label) {
+    switch (label) {
+      case 'scss':
+        return '../lib/css.worker.js';
+      case 'json':
+        return '../lib/json.worker.js';
+      default:
+        return '../lib/editor.worker.js';
     }
-    if (label === 'json') {
-      return '../lib/json.worker.js';
-    }
-    return '../lib/editor.worker.js';
   }
 };
 
 export type ContentType = 'content' | 'styles' | 'metadata';
 
 type EditorState = {
+  initial: Record<ContentType, string>;
   content: Record<ContentType, string>;
   tab: ContentType;
-  loaded: boolean;
+};
+
+const matches = (o1, o2, k) => {
+  return o1 && o2 && o1[k] === o2[k];
 };
 
 export default class Editor extends React.Component<any, EditorState> {
-  public static getDerivedStateFromProps(props) {
-    return props.initial ? { content: props.initial } : {};
+  public static getDerivedStateFromProps(nextProps, prevState) {
+    if (matches(nextProps.initial, prevState.initial, prevState.tab)) {
+      return null;
+    } else {
+      return nextProps.initial
+        ? {
+            initial: nextProps.initial,
+            content: nextProps.initial
+          }
+        : null;
+    }
   }
 
   public editor = null;
@@ -44,13 +59,9 @@ export default class Editor extends React.Component<any, EditorState> {
   };
 
   public state: EditorState = {
-    content: {
-      styles: '',
-      metadata: '',
-      content: ''
-    },
-    tab: 'content',
-    loaded: false
+    content: { styles: '', metadata: '{}', content: '' },
+    initial: { styles: '', metadata: '{}', content: '' },
+    tab: 'content'
   };
 
   @debounce(500)
@@ -91,12 +102,12 @@ export default class Editor extends React.Component<any, EditorState> {
       schemas: [
         {
           uri: 'mw://themes/markwright.json',
-          fileMatch: [ '*' ],
+          fileMatch: ['*'],
           schema
         }
       ]
     });
-  }
+  };
 
   public editorDidMount = editor => {
     editor.getModel().updateOptions({
@@ -105,7 +116,6 @@ export default class Editor extends React.Component<any, EditorState> {
     this.editor = editor;
     this.editor.focus();
     this.editor.layout();
-    this.setState({ loaded: true });
   };
 
   @autobind
@@ -113,7 +123,11 @@ export default class Editor extends React.Component<any, EditorState> {
     this.editor.focus();
   }
 
-  public handleResize = () => this.editor.layout();
+  @throttle(16)
+  @autobind
+  public handleResize() {
+    this.editor.layout();
+  }
 
   public componentDidMount() {
     const tabs: ContentType[] = ['content', 'styles', 'metadata'];
@@ -126,36 +140,30 @@ export default class Editor extends React.Component<any, EditorState> {
     });
   }
 
+  public tab(tab: ContentType) {
+    return () => this.setState({ tab });
+  }
+
   public render() {
     return (
       <div
         id="monaco-container"
-        className={this.state.loaded ? '' : 'spinner'}
-        style={{ width: 'calc(100vw - 8.5in - 2rem' }}
+        style={{ width: '100%' }}
         onMouseOver={this.focus}
       >
         <div className={`tabs ${this.state.tab}`}>
-          <button
-            className="content"
-            onClick={() => this.setState({ tab: 'content' })}
-          >
+          <button className="content" onClick={this.tab('content')}>
             Content (Markdown)
           </button>
-          <button
-            className="styles"
-            onClick={() => this.setState({ tab: 'styles' })}
-          >
+          <button className="styles" onClick={this.tab('styles')}>
             Styles (SCSS)
           </button>
-          <button
-            className="metadata"
-            onClick={() => this.setState({ tab: 'metadata' })}
-          >
+          <button className="metadata" onClick={this.tab('metadata')}>
             Metadata (JSON)
           </button>
         </div>
         <MonacoEditor
-          theme="vs-light"
+          theme="vs-dark"
           options={{
             wordWrap: 'bounded',
             fontFamily: 'Fira Code',

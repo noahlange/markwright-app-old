@@ -1,4 +1,5 @@
 @import url("../node_modules/firacode/distr/fira_code.css");
+@import url("../node_modules/react-mosaic-component/react-mosaic-component.css");
 
 :root {
   --sans-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
@@ -180,42 +181,6 @@ code {
   -webkit-app-region: drag;
 }
 
-.flex {
-  display: flex;
-}
-
-.editor {
-  flex: 3 1 auto;
-  padding-top: 1.5em;
-  background-color: #fff; /*#1e1e1e;*/
-}
-
-.preview {
-  position: relative;
-  flex: 0 0 calc(8.5in + 2rem);
-}
-
-@keyframes spinner {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.spinner:before {
-  content: '';
-  box-sizing: border-box;
-  position: absolute;
-  top: calc(50% - 96px);
-  left: calc(25% - 96px);
-  width: 192px;
-  height: 192px;
-  margin-top: -10px;
-  margin-left: -10px;
-  border-radius: 50%;
-  border: 12px solid #ccc;
-  border-top-color: #333;
-  animation: spinner 0.6s linear infinite;
-}
-
 webview, .preview > div {
   background: transparent;
   overflow: hidden;
@@ -261,8 +226,22 @@ webview, .preview > div {
   height: 2rem;
   border: none;
   font-size: 14px;
-  background-color: #fafafa;
-  color: #bbb;
+  background-color: #1a1a1a;
+  color: #a4a4a4;
+}
+
+.mosaic-window .mosaic-window-toolbar {
+  box-shadow: none;
+  color: #a4a4a4;
+  background-color: #1e1e1e;
+  font-family: var(--sans-stack);
+  font-size: small;
+}
+.mosaic-window .mosaic-window-body {
+  background-color: #1a1a1a;
+}
+.mosaic-window .mosaic-window-title {
+  text-align: center;
 }
 
 .tabs button:focus {
@@ -276,19 +255,23 @@ webview, .preview > div {
 .tabs.content .content,
 .tabs.styles .styles,
 .tabs.metadata .metadata {
-  color: #333;
-  background-color: white;
+  color: #d4d4d4;
+  background-color: #1e1e1e;
 }
 
 #monaco-container {
   resize: vertical;
 }
 
+.mosaic {
+  height: calc(100% - 1.5rem);
+}
+
 header {
   text-align: center;
-  position: relative;
-  top: -0.5rem;
+  height: 2rem;
+  line-height: 2.5rem;
+  color: #d4d4d4;
   font-family: var(--sans-stack);
   font-size: small;
-  color: #333;
 }

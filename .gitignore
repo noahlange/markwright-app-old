@@ -1,7 +1,7 @@
-dist
-lib
+/dist
+/lib
 node_modules
-assets/themes
+/assets/themes
 *.map
 .sass-cache
-yarn.lock
+.DS_Store
