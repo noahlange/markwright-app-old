@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "description": "Bares-bones DTP in Markdown and SCSS.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": "Noah Lange <noahrlange@gmail.com>",
   "dependencies": {
     "change-case": "^3.0.1",

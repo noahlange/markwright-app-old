@@ -1,4 +1,7 @@
-# The Homebrewery
+# Markwright
+
+## 1.3.1
+  - fixes reactivation bug
 
 ## 1.3.0
   - new application icon / .mw document icon
