@@ -64,11 +64,8 @@ export default class App extends React.Component<any, AppState> {
   }
 
   public sass(str: string): Promise<string> {
-    const t = `sass-${Date.now()}`;
-    console.time(t);
     return new Promise((resolve, reject) => {
       this._scss.compile(str, (res: any) => {
-        console.timeEnd(t);
         res.status ? reject(res.message) : resolve(res.text);
       });
     });
@@ -170,10 +167,10 @@ export default class App extends React.Component<any, AppState> {
       p: () => (
         <div onMouseOver={this.onMouseOver}>
           <WebView
-            autosize
-            nodeintegration
             blinkfeatures="OverlayScrollbars"
+            autosize
             src={'preview.html'}
+            preload={'../lib/preload.js'}
           />
         </div>
       )

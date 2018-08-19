@@ -1,12 +1,16 @@
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Markwright</title>
     <link rel="stylesheet" href="../static/app.css" />
   </head>
   <body>
     <div id="grab-bar"></div>
-    <div id="react-root"></div>  
+    <div id="react-root"></div>
     <script type="text/javascript">
+      window.eval = global.eval = () => {
+        throw new Error(`Sorry, window.eval() has been explicitly disabled.`);
+      }
       require('../lib/editor.js');
     </script>
   </body>

@@ -10,9 +10,10 @@ module.exports = [
         languages: ['markdown', 'json', 'css', 'scss']
       })
     ],
+    devtool: "none",
     entry: {
       editor: './src/entry/editor.tsx',
-      preview: './src/entry/preview.tsx'
+      preload: './src/entry/preload.ts'
     },
     output: {
       path: path.resolve(__dirname, './lib'),
@@ -40,6 +41,30 @@ module.exports = [
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.json']
+    }
+  },
+  {
+    mode: 'development',
+    entry: {
+      preview: './src/entry/preview.tsx',
+    },
+    output: {
+      path: path.resolve(__dirname, './lib'),
+      publicPath: '../lib/',
+      filename: '[name].js'
+    },
+    target: 'electron-renderer',
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/
+        }
+      ]
+    },
+    resolve: {
+      extensions: ['.ts', '.tsx', '.js']
     }
   },
   {

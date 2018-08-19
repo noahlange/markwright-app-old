@@ -1,12 +1,12 @@
-import { ipcRenderer as ipc } from 'electron';
 import * as cache from 'js-cache';
 import Markwright from 'markwright';
-import { homedir } from 'os';
 import * as sizes from 'paper-size';
 import * as React from 'react';
 import { proxy } from 'workly';
 
 import * as markwright from '../themes/markwright';
+
+const { _home: home, _on: on, _send: send } = window as any;
 
 type PreviewProps = {};
 type PreviewState = {
@@ -110,14 +110,14 @@ export default class Preview extends React.Component<
   }
 
   protected registerIPCEvents() {
-    ipc.on('editor.metadata', (_: any, metadata: string) =>
+    on('editor.metadata', (_: any, metadata: string) =>
       this.setState({ metadata })
     );
-    ipc.on('editor.markdown', (_: any, markdown: string) =>
+    on('editor.markdown', (_: any, markdown: string) =>
       this.setState({ markdown })
     );
-    ipc.on('editor.css', (_: any, css: string) => this.setState({ css }));
-    ipc.on('editor.base', (_: any, dir: string) => this.setBase(dir));
+    on('editor.css', (_: any, css: string) => this.setState({ css }));
+    on('editor.base', (_: any, dir: string) => this.setBase(dir));
   }
 
   public get page() {
@@ -131,7 +131,7 @@ export default class Preview extends React.Component<
     };
   }
 
-  public setBase(dir = homedir() + '/') {
+  public setBase(dir = home() + '/') {
     const base = document.head.querySelector('base');
     if (base) {
       base.setAttribute('href', dir);
@@ -146,7 +146,7 @@ export default class Preview extends React.Component<
     sizes.register('tabloid', 279, 432);
     sizes.register('half-letter', 140, 216);
     this.setBase();
-    ipc.send('app.ready');
+    send('app.ready');
   }
 
   public render() {
