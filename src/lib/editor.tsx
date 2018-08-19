@@ -1,8 +1,7 @@
 import * as React from 'react';
-import * as monaco from 'monaco-editor';
 import MonacoEditor from 'react-monaco-editor';
 import { autobind } from 'core-decorators';
-import { debounce, throttle } from 'lodash-decorators';
+import { debounce, throttle } from 'lodash';
 
 import { schema } from '../themes/markwright';
 
@@ -62,9 +61,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   public editor: any | null = null;
 
   public change: Record<ContentType, (value: string) => any> = {
-    styles: this.onChangeSCSS,
-    metadata: this.onChangeMetadata,
-    content: this.onChangeMarkdown
+    styles: debounce(this.onChangeSCSS, 500),
+    metadata: debounce(this.onChangeMetadata, 250),
+    content: debounce(this.onChangeMarkdown, 125)
   };
 
   public languages: Record<ContentType, string> = {
@@ -79,19 +78,16 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     tab: 'content'
   };
 
-  @debounce(500)
   @autobind
   public onChangeSCSS(e: string) {
     return this.onChange(e);
   }
 
-  @debounce(500)
   @autobind
   public onChangeMetadata(e: string) {
     return this.onChange(e);
   }
 
-  @debounce(250)
   @autobind
   public onChangeMarkdown(e: string) {
     return this.onChange(e);
@@ -139,11 +135,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     this.editor.focus();
   }
 
-  @throttle(16)
-  @autobind
-  public handleResize() {
+  public handleResize = throttle(() => {
     this.editor.layout();
-  }
+  }, 1000 / 60);
 
   public componentDidMount() {
     const tabs: ContentType[] = ['content', 'styles', 'metadata'];

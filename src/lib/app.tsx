@@ -16,7 +16,7 @@ import { Mosaic, MosaicWindow } from 'react-mosaic-component';
 const TypedMosaic = Mosaic.ofType<'e' | 'p'>();
 const TypedWindow = MosaicWindow.ofType<'e' | 'p'>();
 
-import resolvers from '../lib/resolvers';
+import * as r from '../lib/resolvers';
 import Editor, { ContentType } from './editor';
 import { version } from '../../package.json';
 
@@ -31,6 +31,7 @@ type AppState = {
 const transclude = promisify(transcludeString);
 
 export default class App extends React.Component<any, AppState> {
+  protected _scss: typeof Sass = new Sass();
   protected _read: boolean = false;
   protected _preview: WebviewTag | null = null;
   protected _content: Record<ContentType & 'css', string> = {
@@ -63,9 +64,11 @@ export default class App extends React.Component<any, AppState> {
   }
 
   public sass(str: string): Promise<string> {
+    const t = `sass-${Date.now()}`;
+    console.time(t);
     return new Promise((resolve, reject) => {
-      const scss = new Sass();
-      scss.compile(str, (res: any) => {
+      this._scss.compile(str, (res: any) => {
+        console.timeEnd(t);
         res.status ? reject(res.message) : resolve(res.text);
       });
     });
@@ -103,6 +106,7 @@ export default class App extends React.Component<any, AppState> {
 
   public componentDidMount() {
     Sass.setWorkerUrl('../node_modules/sass.js/dist/sass.worker.js');
+    this._scss.importer(r.sass(() => this.state.base));
     this._preview = document.querySelector('webview');
     ipc.on('save', this.saveFile);
     ipc.on('open', this.openFile);
@@ -141,7 +145,7 @@ export default class App extends React.Component<any, AppState> {
       case 'content':
         try {
           const markdown = await transclude(value, {
-            resolvers: resolvers(this.state.base)
+            resolvers: r.markdown(this.state.base)
           });
           this._content = { ...this._content, content: value };
           preview.send('editor.markdown', markdown);

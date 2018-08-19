@@ -1,5 +1,10 @@
 # Markwright
 
+## 0.5.0
+  - adds relative SASS imports.
+  - init SASS on construction, instead of initializing onChange. Oops. 😬
+  - re-implements throttling/debouncing
+
 ## 0.4.1
   - minor bugfixes
   - tsconfig -> strict mode enabled
