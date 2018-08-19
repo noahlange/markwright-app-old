@@ -189,7 +189,6 @@ app.on('window-all-closed', function() {
 });
 
 app.on('open-file', (e, path) => {
-
   e.preventDefault();
 
   if (mainWindow === null) {

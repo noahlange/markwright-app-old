@@ -23,7 +23,7 @@ export default class Preview extends React.Component<
 
   public mouse = { x: 0, y: 0 };
 
-  public $hint: Record<string, HTMLElement> = {
+  public $hint: Record<string, HTMLElement | null> = {
     element: null,
     tooltip: null
   };
@@ -110,12 +110,14 @@ export default class Preview extends React.Component<
   }
 
   protected registerIPCEvents() {
-    ipc.on('editor.metadata', (e, metadata) => this.setState({ metadata }));
-    ipc.on('editor.markdown', (e, markdown) => this.setState({ markdown }));
-    ipc.on('editor.css', (e, css) => this.setState({ css }));
-    ipc.on('editor.base', (e, dir) => {
-      document.head.querySelector('base').setAttribute('href', dir);
-    });
+    ipc.on('editor.metadata', (_: any, metadata: string) =>
+      this.setState({ metadata })
+    );
+    ipc.on('editor.markdown', (_: any, markdown: string) =>
+      this.setState({ markdown })
+    );
+    ipc.on('editor.css', (_: any, css: string) => this.setState({ css }));
+    ipc.on('editor.base', (_: any, dir: string) => this.setBase(dir));
   }
 
   public get page() {
@@ -129,6 +131,13 @@ export default class Preview extends React.Component<
     };
   }
 
+  public setBase(dir = homedir() + '/') {
+    const base = document.head.querySelector('base');
+    if (base) {
+      base.setAttribute('href', dir);
+    }
+  }
+
   public componentDidMount() {
     this.registerToolTipEvents();
     this.registerIPCEvents();
@@ -136,8 +145,7 @@ export default class Preview extends React.Component<
     sizes.register('legal', 216, 356);
     sizes.register('tabloid', 279, 432);
     sizes.register('half-letter', 140, 216);
-    document.head.querySelector('base').setAttribute('href', homedir() + '/');
-
+    this.setBase();
     ipc.send('app.ready');
   }
 
@@ -146,7 +154,7 @@ export default class Preview extends React.Component<
     return (
       <main
         style={{
-          paddingTop: "2.5rem",
+          paddingTop: '2.5rem',
           height: '100%',
           width: '100%',
           display: 'flex',
@@ -164,7 +172,7 @@ export default class Preview extends React.Component<
               height: page.height * 96
             },
             manual: this.metadata('manual', false),
-            highlight: (str, lang) => {
+            highlight: (str: string, lang: string) => {
               const key = `${lang}::${str}`;
               const has = cache.get(key);
               if (has) {

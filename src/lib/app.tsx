@@ -3,7 +3,7 @@ import { basename, dirname } from 'path';
 import * as Sass from 'sass.js/dist/sass.js';
 import { autobind } from 'core-decorators';
 
-import { ipcRenderer as ipc, remote } from 'electron';
+import { ipcRenderer as ipc, remote, WebviewTag } from 'electron';
 import { readFileSync, writeFileSync } from 'fs';
 import { transcludeString } from 'hercule';
 import * as WebView from 'react-electron-web-view';
@@ -32,7 +32,7 @@ const transclude = promisify(transcludeString);
 
 export default class App extends React.Component<any, AppState> {
   protected _read: boolean = false;
-  protected _preview: WebView;
+  protected _preview: WebviewTag | null = null;
   protected _content: Record<ContentType & 'css', string> = {
     version,
     styles: '',
@@ -41,7 +41,7 @@ export default class App extends React.Component<any, AppState> {
     css: ''
   };
 
-  public state = {
+  public state: AppState = {
     current: 'Untitled.mw',
     base: homedir() + '/',
     initial: {
@@ -65,14 +65,14 @@ export default class App extends React.Component<any, AppState> {
   public sass(str: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const scss = new Sass();
-      scss.compile(str, res => {
+      scss.compile(str, (res: any) => {
         res.status ? reject(res.message) : resolve(res.text);
       });
     });
   }
 
   @autobind
-  public openFile(e, file) {
+  public openFile(_: any, file: string) {
     this._read = false;
     this.setState(
       {
@@ -84,13 +84,15 @@ export default class App extends React.Component<any, AppState> {
         this.onChange('content', this.state.initial.content);
         this.onChange('metadata', this.state.initial.metadata);
         this.onChange('styles', this.state.initial.styles);
-        this._preview.send('editor.base', this.state.base);
+        if (this._preview) {
+          this._preview.send('editor.base', this.state.base);
+        }
       }
     );
   }
 
   @autobind
-  public saveFile(e, file) {
+  public saveFile(_: any, file: string) {
     try {
       this.setState({ current: basename(file) });
       writeFileSync(file, JSON.stringify(this._content), 'utf8');
@@ -116,17 +118,22 @@ export default class App extends React.Component<any, AppState> {
 
   @autobind
   public onMouseOver() {
-    this._preview.focus();
+    if (this._preview) {
+      this._preview.focus();
+    }
   }
 
   @autobind
-  public async onChange(key: ContentType, value) {
+  public async onChange(key: ContentType, value: string) {
+    const preview = this._preview || {
+      send: (_key: string, _value: any) => null
+    };
     switch (key) {
       case 'metadata':
         try {
           const data = parse(value);
           this._content = { ...this._content, metadata: value };
-          this._preview.send('editor.metadata', data || {});
+          preview.send('editor.metadata', data || {});
         } catch (e) {
           console.warn('bad metadata');
         }
@@ -137,16 +144,16 @@ export default class App extends React.Component<any, AppState> {
             resolvers: resolvers(this.state.base)
           });
           this._content = { ...this._content, content: value };
-          this._preview.send('editor.markdown', markdown);
+          preview.send('editor.markdown', markdown);
         } catch (e) {
-          this._preview.send('editor.markdown', value);
+          preview.send('editor.markdown', value);
         }
         break;
       case 'styles':
         this.sass(value)
           .then(result => {
             this._content = { ...this._content, styles: value };
-            this._preview.send('editor.css', result);
+            preview.send('editor.css', result);
           })
           .catch(e => console.warn(e));
     }
@@ -155,12 +162,7 @@ export default class App extends React.Component<any, AppState> {
   public render() {
     const initial = this.initial;
     const elements = {
-      e: () => {
-        const read = this._read;
-        return (
-          <Editor refresh={!read} onChange={this.onChange} initial={initial} />
-        );
-      },
+      e: () => <Editor onChange={this.onChange} initial={initial} />,
       p: () => (
         <div onMouseOver={this.onMouseOver}>
           <WebView

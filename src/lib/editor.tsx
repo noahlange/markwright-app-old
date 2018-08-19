@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as monaco from 'monaco-editor';
 import MonacoEditor from 'react-monaco-editor';
 import { autobind } from 'core-decorators';
 import { debounce, throttle } from 'lodash-decorators';
@@ -6,7 +7,7 @@ import { debounce, throttle } from 'lodash-decorators';
 import { schema } from '../themes/markwright';
 
 (window as any).MonacoEnvironment = {
-  getWorkerUrl(_, label) {
+  getWorkerUrl(_: any, label: string) {
     switch (label) {
       case 'scss':
         return '../lib/css.worker.js';
@@ -20,31 +21,28 @@ import { schema } from '../themes/markwright';
 
 export type ContentType = 'content' | 'styles' | 'metadata';
 
+type EditorProps = {
+  initial: Record<ContentType, string> | null;
+  onChange: (k: ContentType, v: string) => any;
+};
+
 type EditorState = {
   initial: Record<ContentType, string>;
   content: Record<ContentType, string>;
   tab: ContentType;
 };
 
-const matches = (o1, o2, k) => {
-  return o1 && o2 && o1[k] === o2[k];
-};
-
-export default class Editor extends React.Component<any, EditorState> {
-  public static getDerivedStateFromProps(nextProps, prevState) {
-    if (matches(nextProps.initial, prevState.initial, prevState.tab)) {
-      return null;
-    } else {
-      return nextProps.initial
-        ? {
-            initial: nextProps.initial,
-            content: nextProps.initial
-          }
-        : null;
-    }
+export default class Editor extends React.Component<EditorProps, EditorState> {
+  public static getDerivedStateFromProps(nextProps: EditorProps) {
+    return nextProps.initial
+      ? {
+          initial: nextProps.initial,
+          content: nextProps.initial
+        }
+      : null;
   }
 
-  public editor = null;
+  public editor: any | null = null;
 
   public change: Record<ContentType, (value: string) => any> = {
     styles: this.onChangeSCSS,
@@ -66,23 +64,24 @@ export default class Editor extends React.Component<any, EditorState> {
 
   @debounce(500)
   @autobind
-  public onChangeSCSS(e) {
+  public onChangeSCSS(e: string) {
     return this.onChange(e);
   }
 
   @debounce(500)
   @autobind
-  public onChangeMetadata(e) {
+  public onChangeMetadata(e: string) {
     return this.onChange(e);
   }
 
   @debounce(250)
   @autobind
-  public onChangeMarkdown(e) {
+  public onChangeMarkdown(e: string) {
     return this.onChange(e);
   }
 
-  public onChange = e => {
+  @autobind
+  public onChange(e: string) {
     this.setState(
       {
         content: {
@@ -94,9 +93,10 @@ export default class Editor extends React.Component<any, EditorState> {
         this.props.onChange(this.state.tab, e);
       }
     );
-  };
+  }
 
-  public editorWillMount = monaco => {
+  @autobind
+  public editorWillMount(monaco: any) {
     monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
       allowComments: true,
       schemas: [
@@ -107,16 +107,15 @@ export default class Editor extends React.Component<any, EditorState> {
         }
       ]
     });
-  };
+  }
 
-  public editorDidMount = editor => {
-    editor.getModel().updateOptions({
-      tabSize: 2
-    });
+  @autobind
+  public editorDidMount(editor: any) {
+    editor.getModel().updateOptions({ tabSize: 2 });
     this.editor = editor;
     this.editor.focus();
     this.editor.layout();
-  };
+  }
 
   @autobind
   public focus() {

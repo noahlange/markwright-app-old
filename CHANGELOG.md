@@ -1,5 +1,9 @@
 # Markwright
 
+## 0.4.1
+  - minor bugfixes
+  - tsconfig -> strict mode enabled
+
 ## 0.4.0
   - rewrites history, pretending we were at 0.x all along
   - switches out static highlight.js with highlight.js from npm

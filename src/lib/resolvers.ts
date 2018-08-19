@@ -8,16 +8,16 @@ import * as toString from 'stream-to-string';
  * a bajillion fs requests with every setState.
  */
 
-export default base =>
+export default (base: string) =>
   [resolveHttpUrl, resolveLocalUrl, resolveString].map(resolve => {
-    return url => {
+    return (url: string) => {
       const has = cache.get(url);
       if (has) {
         return has;
       } else {
         const res = resolve(path.resolve(base, url), '/');
         if (res) {
-          toString(res.content).then(res =>
+          toString(res.content).then((res: string) =>
             cache.set(url, { url, content: res })
           );
           return res;

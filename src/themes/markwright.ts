@@ -65,7 +65,11 @@ export const defaults = {
   paper: 'letter'
 };
 
-export function styles(metadata, width: number, height: number) {
+export function styles<T extends typeof defaults>(
+  metadata: T,
+  width: number,
+  height: number
+) {
   const o = Object.assign(defaults, metadata);
 
   const marginInner = 1;

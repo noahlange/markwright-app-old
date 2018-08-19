@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "commonjs",
+    "target": "es2017",
+    "module": "esnext",
     "rootDir": "src",
     "outDir": "lib",
     "jsx": "react",
-    "sourceMap": true,
+    "inlineSourceMap": true,
+    "strict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true
   }

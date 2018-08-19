@@ -43,6 +43,7 @@ module.exports = [
     }
   },
   {
+    mode: 'development',
     entry: {
       highlight: './src/entry/highlight.ts'
     },
