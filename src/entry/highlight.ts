@@ -1,13 +1,8 @@
-declare var workly;
-declare var hljs;
-
-importScripts(
-  '../static/highlight.pack.js',
-  '../node_modules/workly/dist/workly.min.js'
-);
+import { highlightAuto } from 'highlight.js';
+import { expose } from 'workly';
 
 function highlight(str, lang) {
-  return hljs.highlightAuto(str, [lang]).value;
+  return highlightAuto(str, [lang]).value;
 }
 
-workly.expose(highlight);
+expose(highlight);

@@ -19,7 +19,7 @@ export default class Preview extends React.Component<
   PreviewProps,
   PreviewState
 > {
-  public highlight = proxy('../lib/highlight.js');
+  public highlight = proxy('../lib/highlight.worker.js');
 
   public mouse = { x: 0, y: 0 };
 
