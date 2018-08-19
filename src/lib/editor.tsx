@@ -21,25 +21,42 @@ import { schema } from '../themes/markwright';
 
 export type ContentType = 'content' | 'styles' | 'metadata';
 
+type ContentHash = Record<ContentType, string>;
+
 type EditorProps = {
-  initial: Record<ContentType, string> | null;
+  initial: ContentHash | null;
   onChange: (k: ContentType, v: string) => any;
 };
 
 type EditorState = {
-  initial: Record<ContentType, string>;
-  content: Record<ContentType, string>;
+  initial: ContentHash;
+  content: ContentHash;
   tab: ContentType;
 };
 
+function matches<A extends ContentHash, B extends ContentHash>(
+  o1: A | null,
+  o2: B | null,
+  k: ContentType
+) {
+  return o1 && o2 && o1[k] === o2[k];
+}
+
 export default class Editor extends React.Component<EditorProps, EditorState> {
-  public static getDerivedStateFromProps(nextProps: EditorProps) {
-    return nextProps.initial
-      ? {
-          initial: nextProps.initial,
-          content: nextProps.initial
-        }
-      : null;
+  public static getDerivedStateFromProps(
+    nextProps: EditorProps,
+    prevState: EditorState
+  ) {
+    if (matches(nextProps.initial, prevState.initial, prevState.tab)) {
+      return null;
+    } else {
+      return nextProps.initial
+        ? {
+            initial: nextProps.initial,
+            content: nextProps.initial
+          }
+        : null;
+    }
   }
 
   public editor: any | null = null;
