@@ -10,10 +10,22 @@ const {
 const { writeFileSync } = require('fs');
 const path = require('path');
 const url = require('url');
+const sizes = require('paper-size');
+
+sizes.register('letter', 216, 279);
+sizes.register('legal', 216, 356);
+sizes.register('tabloid', 279, 432);
+sizes.register('half-letter', 140, 216);
 
 let mainWindow;
 let current;
 let ready = false;
+let documentMetadata = {};
+
+const getSizeOf = paper => {
+  const [width, height] = sizes.getSize(paper);
+  return { width: width / 1000, height: height / 1000 };
+};
 
 function makeMenu() {
   const saveOpts = {
@@ -91,7 +103,14 @@ function makeMenu() {
                 {
                   marginsType: 1,
                   printBackground: true,
-                  pageSize: 'Letter'
+                  pageSize:
+                    documentMetadata && documentMetadata.paper
+                      ? getSizeOf(documentMetadata.paper)
+                      : 'Letter',
+                  landscape:
+                    documentMetadata && documentMetadata.orientation
+                      ? documentMetadata.orientation === 'landscape'
+                      : false
                 },
                 (err, data) => {
                   writeFileSync(file, data);
@@ -194,6 +213,8 @@ app.on('open-file', (e, path) => {
   if (mainWindow === null) {
     createWindow();
   }
+
+  ipcMain.on('app.metadata', m => (documentMetadata = m));
 
   ipcMain.on('app.ready', () => {
     ready = true;

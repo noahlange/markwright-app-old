@@ -1,5 +1,5 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import Preview from '../lib/preview';
+import Preview from '../lib/components/preview';
 
-render(<Preview /> as any, document.getElementById('mw-root'));
+render(<Preview />, document.getElementById('mw-root'));

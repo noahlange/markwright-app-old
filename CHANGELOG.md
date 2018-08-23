@@ -1,5 +1,11 @@
 # Markwright
 
+## 0.6.0
+  - adds problems panel
+  - modularizes content processing
+  - throttles resize + mousemove events
+  - adjusts some security settings
+
 ## 0.5.0
   - adds relative SASS imports.
   - init SASS on construction, instead of initializing onChange. Oops. 😬

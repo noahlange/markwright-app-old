@@ -1,5 +1,5 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import App from '../lib/app';
+import App from '../lib/components/app';
 
-render(<App /> as any, document.getElementById('react-root'));
+render(<App />, document.getElementById('react-root'));

@@ -39,29 +39,37 @@ const options = [
 ];
 
 export const schema = {
-  type: 'object',
   properties: {
     columns: {
-      title: 'Column count',
       default: 1,
+      title: 'Column count',
       type: 'integer'
     },
     manual: {
-      title: 'Manual pagination',
       default: false,
+      title: 'Manual pagination',
       type: 'boolean'
     },
+    orientation: {
+      default: 'portrait',
+      description: 'Paper orientation',
+      enum: ['portrait', 'landscape'],
+      title: 'Orientation'
+    },
     paper: {
-      title: 'Paper size',
-      description: 'Common name of paper size',
       default: 'letter',
-      enum: options
+      description: 'Common name of paper size',
+      enum: options,
+      title: 'Paper size'
     }
-  }
+  },
+  type: 'object'
 };
 
 export const defaults = {
   columns: 1,
+  manual: false,
+  orientation: 'portrait',
   paper: 'letter'
 };
 
@@ -70,7 +78,7 @@ export function styles<T extends typeof defaults>(
   width: number,
   height: number
 ) {
-  const o = Object.assign(defaults, metadata);
+  const o = { ...defaults, ...(metadata as object) };
 
   const marginInner = 1;
   const marginOuter = 1;
@@ -183,12 +191,9 @@ export function styles<T extends typeof defaults>(
     }
     
     .column {
-      flex-basis: var(--col-width);
-      width: var(--col-width);
+      flex: 0 0 var(--col-width);
       height: var(--col-height);
       min-height: var(--col-height);
-      flex-grow: 0;
-      flex-shrink: 0;
       word-wrap: break-word;
     }
     
@@ -201,8 +206,11 @@ export function styles<T extends typeof defaults>(
     }
     
     .column-separator {
-      min-width: var(--col-gutter);
+      display: block;
+      border: none;
       height: 100%;
+      flex: 0 0 var(--col-gutter);
+      margin: 0;
     }
     
     .footnotes:not(.empty) {

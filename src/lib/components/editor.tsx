@@ -1,9 +1,10 @@
-import * as React from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import { autobind } from 'core-decorators';
 import { debounce, throttle } from 'lodash';
+import * as React from 'react';
+import MonacoEditor from 'react-monaco-editor';
 
-import { schema } from '../themes/markwright';
+import { schema } from '../../themes/markwright';
+import listen from '../listen';
 
 (window as any).MonacoEnvironment = {
   getWorkerUrl(_: any, label: string) {
@@ -51,8 +52,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     } else {
       return nextProps.initial
         ? {
-            initial: nextProps.initial,
-            content: nextProps.initial
+            content: nextProps.initial,
+            initial: nextProps.initial
           }
         : null;
     }
@@ -61,15 +62,19 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   public editor: any | null = null;
 
   public change: Record<ContentType, (value: string) => any> = {
-    styles: debounce(this.onChangeSCSS, 500),
+    content: debounce(this.onChangeMarkdown, 125),
     metadata: debounce(this.onChangeMetadata, 250),
-    content: debounce(this.onChangeMarkdown, 125)
+    styles: debounce(this.onChangeSCSS, 500)
   };
 
+  public handleResize = throttle(() => {
+    this.editor.layout();
+  }, 1000 / 60);
+
   public languages: Record<ContentType, string> = {
-    styles: 'scss',
+    content: 'markdown',
     metadata: 'json',
-    content: 'markdown'
+    styles: 'scss'
   };
 
   public state: EditorState = {
@@ -114,9 +119,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
       allowComments: true,
       schemas: [
         {
-          uri: 'mw://themes/markwright.json',
           fileMatch: ['*'],
-          schema
+          schema,
+          uri: 'mw://themes/markwright.json'
         }
       ]
     });
@@ -135,13 +140,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     this.editor.focus();
   }
 
-  public handleResize = throttle(() => {
-    this.editor.layout();
-  }, 1000 / 60);
-
   public componentDidMount() {
     const tabs: ContentType[] = ['content', 'styles', 'metadata'];
-    window.addEventListener('resize', this.handleResize);
+    listen('resize', this.handleResize);
     window.addEventListener('keypress', e => {
       if (e.ctrlKey && e.code === 'Tab') {
         const idx = (tabs.indexOf(this.state.tab) + 1) % 3;
@@ -175,10 +176,10 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         <MonacoEditor
           theme="vs-dark"
           options={{
-            wordWrap: 'bounded',
             fontFamily: 'Fira Code',
             fontLigatures: true,
-            fontSize: 15
+            fontSize: 15,
+            wordWrap: 'bounded'
           }}
           editorWillMount={this.editorWillMount}
           editorDidMount={this.editorDidMount}

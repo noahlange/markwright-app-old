@@ -10,7 +10,7 @@ module.exports = [
         languages: ['markdown', 'json', 'css', 'scss']
       })
     ],
-    devtool: "none",
+    devtool: 'none',
     entry: {
       editor: './src/entry/editor.tsx',
       preload: './src/entry/preload.ts'
@@ -46,7 +46,7 @@ module.exports = [
   {
     mode: 'development',
     entry: {
-      preview: './src/entry/preview.tsx',
+      preview: './src/entry/preview.tsx'
     },
     output: {
       path: path.resolve(__dirname, './lib'),

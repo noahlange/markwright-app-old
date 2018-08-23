@@ -8,3 +8,4 @@ declare module 'sass.js/dist/sass.js';
 declare module 'stream-to-string';
 declare module 'react-electron-web-view';
 declare module 'workly';
+declare module 'line-column';
