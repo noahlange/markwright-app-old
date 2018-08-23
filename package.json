@@ -8,7 +8,6 @@
   "dependencies": {
     "change-case": "^3.0.1",
     "core-decorators": "^0.20.0",
-    "electron": "^3.0.0-beta.5",
     "firacode": "^1.205.0",
     "front-matter": "^2.3.0",
     "gray-matter": "^4.0.1",
@@ -39,6 +38,7 @@
     "@types/react": "^16.4.11",
     "@types/react-dom": "^16.0.7",
     "css-loader": "^1.0.0",
+    "electron": "^3.0.0-beta.5",
     "electron-builder": "^20.28.2",
     "monaco-editor-webpack-plugin": "^1.5.1",
     "prettier": "^1.14.2",
