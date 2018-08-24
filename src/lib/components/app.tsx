@@ -2,7 +2,7 @@ import { autobind } from 'core-decorators';
 import { basename, dirname } from 'path';
 import * as React from 'react';
 
-import { ipcRenderer as ipc, remote, WebviewTag } from 'electron';
+import { ipcRenderer as ipc, remote, session, WebviewTag } from 'electron';
 import { readFileSync, writeFileSync } from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { homedir } from 'os';
@@ -127,9 +127,12 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   public componentDidMount() {
-    this.preview = document.querySelector('webview');
+    this.preview = document.querySelector('webview')
     ipc.on('save', this.saveFile);
     ipc.on('open', this.openFile);
+    ipc.on('error', (_: any, e: string) => {
+      this.report('content', false, [ e ])
+    });
     // attempt to open file on Windows
     const args = remote.process.argv.slice();
     let arg = args.pop();

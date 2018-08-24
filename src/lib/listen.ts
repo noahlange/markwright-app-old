@@ -5,36 +5,64 @@
 
 type Listener<T = Event> = (e: T) => void;
 
-const callbacks: Array<Listener<any>> = [];
+const callbacks: Record<string, Array<Listener<any>>> = {};
 let running: boolean = false;
 
-function handler(e: Event) {
-  if (!running) {
-    running = true;
-    window.requestAnimationFrame(() => runCallbacks(e));
-  }
+function handler(event: string) {
+  return (e: Event) => {
+    if (!running) {
+      running = true;
+      window.requestAnimationFrame(() => runCallbacks(event, e));
+    }
+  };
 }
 
 // run the actual callbacks
-function runCallbacks(e: MouseEvent | Event) {
-  callbacks.forEach(cb => cb(e));
-  running = false;
+function runCallbacks(event: string, e: MouseEvent | Event) {
+  if (event in callbacks) {
+    callbacks[event].forEach(cb => cb(e));
+    running = false;
+  }
 }
 
 // adds callback to loop
-function addCallback(callback: Listener) {
+function addCallback(event: string, callback: Listener) {
   if (callback) {
-    callbacks.push(callback);
+    event in callbacks
+      ? callbacks[event].push(callback)
+      : (callbacks[event] = [callback]);
   }
 }
 
-function listen(event: 'mousemove', callback: Listener<MouseEvent>): void;
-function listen(event: 'resize', callback: Listener): void;
-function listen(event: string, callback: Listener<any>): void {
+export function unlisten(...events: string[]): void {
+  for (const event of events) {
+    if (event in callbacks) {
+      callbacks[event] = [];
+    }
+  }
+}
+
+export function listen(
+  event: 'keydown' | 'keyup' | 'keypress',
+  callback: Listener<KeyboardEvent>
+): void;
+export function listen(
+  event: 'mousewheel',
+  callback: Listener<WheelEvent>
+): void;
+export function listen(
+  event: 'mousemove',
+  callback: Listener<MouseEvent>
+): void;
+export function listen(event: 'resize', callback: Listener<UIEvent>): void;
+export function listen(event: string, callback: Listener<any>): void {
+  const toThrottle = ['mousewheel', 'mousemove', 'resize'];
   if (!callbacks.length) {
-    window.addEventListener(event, handler);
+    if (toThrottle.includes(event)) {
+      addCallback(event, callback);
+      window.addEventListener(event, handler(event));
+    } else {
+      window.addEventListener(event, callback);
+    }
   }
-  addCallback(callback);
 }
-
-export default listen;

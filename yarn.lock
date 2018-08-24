@@ -234,6 +234,12 @@ ajv@^6.5.2:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
+amator@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/amator/-/amator-1.1.0.tgz#08c6b60bc93aec2b61bbfc0c4d677d30323cc0f1"
+  dependencies:
+    bezier-easing "^2.0.3"
+
 ansi-align@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-2.0.0.tgz#c36aeccba563b89ceb556f3690f0b1d9e3547f7f"
@@ -447,6 +453,10 @@ bcrypt-pbkdf@^1.0.0:
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz#63bc5dcb61331b92bc05fd528953c33462a06f8d"
   dependencies:
     tweetnacl "^0.14.3"
+
+bezier-easing@^2.0.3:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/bezier-easing/-/bezier-easing-2.1.0.tgz#c04dfe8b926d6ecaca1813d69ff179b7c2025d86"
 
 big.js@^3.1.3:
   version "3.2.0"
@@ -3102,6 +3112,13 @@ pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
 
+panzoom@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/panzoom/-/panzoom-6.0.1.tgz#218caf7b6dcb2341aaed27a183d96c323ec45324"
+  dependencies:
+    amator "^1.1.0"
+    wheel "0.0.5"
+
 paper-size@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/paper-size/-/paper-size-1.1.0.tgz#5b1f5214de69e1f1ec2add60f787f20666583194"
@@ -4632,6 +4649,10 @@ webpack@^4.17.1:
 whatwg-fetch@>=0.10.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-2.0.4.tgz#dde6a5df315f9d39991aa17621853d720b85566f"
+
+wheel@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/wheel/-/wheel-0.0.5.tgz#8b4d0930e72c9b8dfbb907833ee333de97b014fa"
 
 which-module@^2.0.0:
   version "2.0.0"

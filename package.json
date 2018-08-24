@@ -2,7 +2,7 @@
   "name": "Markwright",
   "private": true,
   "license": "MIT",
-  "description": "Bares-bones DTP in Markdown and SCSS.",
+  "description": "Bares-bones desktop publishing in Markdown and SCSS.",
   "version": "0.6.0",
   "author": "Noah Lange <noahrlange@gmail.com>",
   "dependencies": {
@@ -19,6 +19,7 @@
     "lodash": "^4.17.10",
     "markwright": "noahlange/markwright",
     "monaco-editor": "^0.14.3",
+    "panzoom": "^6.0.1",
     "paper-size": "^1.1.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -54,14 +55,12 @@
   "main": "main.js",
   "scripts": {
     "dist": "npm run build && build",
+    "release": "npm run build && build",
     "start": "electron .",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
     "pretty": "prettier --write 'src/**/*' 'main.js'",
     "lint": "tslint 'src/**/*'"
-  },
-  "prettier": {
-    "singleQuote": true
   },
   "build": {
     "appId": "com.noahlange.markwright",
@@ -71,8 +70,7 @@
     },
     "fileAssociations": {
       "ext": "mw",
-      "name": "Markwright document",
-      "icon": "assets/file_icon.icns"
+      "name": "Markwright document"
     },
     "files": [
       "assets",
@@ -87,6 +85,10 @@
       "icon": "assets/icon.icns",
       "category": "public.app-category.graphics-design",
       "target": "dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
     }
   }
 }

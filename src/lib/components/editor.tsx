@@ -1,10 +1,10 @@
 import { autobind } from 'core-decorators';
-import { debounce, throttle } from 'lodash';
+import { Cancelable, debounce } from 'lodash';
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 
 import { schema } from '../../themes/markwright';
-import listen from '../listen';
+import { listen, unlisten } from '../listen';
 
 (window as any).MonacoEnvironment = {
   getWorkerUrl(_: any, label: string) {
@@ -61,15 +61,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
   public editor: any | null = null;
 
-  public change: Record<ContentType, (value: string) => any> = {
+  public change: Record<ContentType, ((value: string) => any) & Cancelable> = {
     content: debounce(this.onChangeMarkdown, 125),
     metadata: debounce(this.onChangeMetadata, 250),
     styles: debounce(this.onChangeSCSS, 500)
   };
-
-  public handleResize = throttle(() => {
-    this.editor.layout();
-  }, 1000 / 60);
 
   public languages: Record<ContentType, string> = {
     content: 'markdown',
@@ -82,6 +78,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     initial: { styles: '', metadata: '{}', content: '' },
     tab: 'content'
   };
+
+  @autobind
+  public handleResize() {
+    this.editor.layout();
+  }
 
   @autobind
   public onChangeSCSS(e: string) {
@@ -143,12 +144,17 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   public componentDidMount() {
     const tabs: ContentType[] = ['content', 'styles', 'metadata'];
     listen('resize', this.handleResize);
-    window.addEventListener('keypress', e => {
+    listen('keypress', e => {
       if (e.ctrlKey && e.code === 'Tab') {
         const idx = (tabs.indexOf(this.state.tab) + 1) % 3;
+        this.change[this.state.tab].flush();
         this.setState({ tab: tabs[idx] });
       }
     });
+  }
+
+  public componentWillUnmount() {
+    unlisten('keypress', 'resize');
   }
 
   public tab(tab: ContentType) {

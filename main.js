@@ -7,6 +7,7 @@ const {
   webContents,
   Menu
 } = require('electron');
+
 const { writeFileSync } = require('fs');
 const path = require('path');
 const url = require('url');
@@ -176,6 +177,16 @@ function createWindow() {
       slashes: true
     })
   );
+
+  ipcMain.on('app.ready', () => {
+    mainWindow.webContents.session.webRequest.onErrorOccurred(details => {
+      // we want to report broken images, etc., to the problems pane
+      if (details.resourceType === 'image') {
+        mainWindow.webContents
+          .send('error', `${ details.error } (${details.url})`);
+      }
+    });
+  });
 
   mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
