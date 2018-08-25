@@ -116,7 +116,7 @@ export default class Preview extends React.Component<
           alignItems: 'center',
           display: 'flex',
           height: '100vh',
-          // justifyContent: 'center',
+          justifyContent: 'center',
           width: '100vw',
         }}
       >
