@@ -279,9 +279,10 @@ header {
 
 .problems {
   color: #d4d4d4;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   height: 100%;
   font-family: var(--mono-stack);
   font-size: small;
   padding: 1rem;
+  line-height: 1.5;
 }

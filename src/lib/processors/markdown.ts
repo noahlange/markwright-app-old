@@ -1,13 +1,13 @@
 import { transcludeString } from 'hercule';
 import { promisify } from 'util';
 
-import { ContentType } from '../components/editor';
 import Processor from '../processor';
 import md from '../resolvers/markdown';
+import { ContentType } from '../types';
 
 export default class MarkdownProcessor extends Processor {
   public transclude = promisify(transcludeString);
-  public type: ContentType = 'content';
+  public type: ContentType = ContentType.CONTENT;
 
   public async process(value: string) {
     this.content = value;

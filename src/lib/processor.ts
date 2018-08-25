@@ -1,4 +1,4 @@
-import { ContentType } from './components/editor';
+import { ContentType } from './types';
 
 export type ReporterFunction = (
   name: ContentType,

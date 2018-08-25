@@ -2,7 +2,7 @@ import { autobind } from 'core-decorators';
 import { basename, dirname } from 'path';
 import * as React from 'react';
 
-import { ipcRenderer as ipc, remote, session, WebviewTag } from 'electron';
+import { ipcRenderer as ipc, remote, WebviewTag } from 'electron';
 import { readFileSync, writeFileSync } from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { homedir } from 'os';
@@ -10,7 +10,8 @@ import * as WebView from 'react-electron-web-view';
 
 import { Mosaic, MosaicWindow } from 'react-mosaic-component';
 
-import Editor, { ContentType } from './editor';
+import { ContentType } from '../types';
+import Editor from './editor';
 import Problems from './problems';
 
 import JSONCProcessor from '../processors/jsonc';
@@ -97,9 +98,9 @@ export default class App extends React.Component<{}, AppState> {
         initial: jsonc.parse(readFileSync(file, 'utf8'))
       },
       () => {
-        this.onChange('content', this.state.initial.content);
-        this.onChange('metadata', this.state.initial.metadata);
-        this.onChange('styles', this.state.initial.styles);
+        this.onChange(ContentType.CONTENT, this.state.initial.content);
+        this.onChange(ContentType.METADATA, this.state.initial.metadata);
+        this.onChange(ContentType.STYLES, this.state.initial.styles);
         if (this.preview) {
           this.preview.send('editor.base', this.state.base);
         }
@@ -131,7 +132,7 @@ export default class App extends React.Component<{}, AppState> {
     ipc.on('save', this.saveFile);
     ipc.on('open', this.openFile);
     ipc.on('error', (_: any, e: string) => {
-      this.report('content', false, [ e ])
+      this.report(ContentType.CONTENT, false, [ e ])
     });
     // attempt to open file on Windows
     const args = remote.process.argv.slice();

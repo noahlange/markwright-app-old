@@ -5,6 +5,7 @@ import MonacoEditor from 'react-monaco-editor';
 
 import { schema } from '../../themes/markwright';
 import { listen, unlisten } from '../listen';
+import { ContentType } from '../types';
 
 (window as any).MonacoEnvironment = {
   getWorkerUrl(_: any, label: string) {
@@ -18,8 +19,6 @@ import { listen, unlisten } from '../listen';
     }
   }
 };
-
-export type ContentType = 'content' | 'styles' | 'metadata';
 
 type ContentHash = Record<ContentType, string>;
 
@@ -76,7 +75,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   public state: EditorState = {
     content: { styles: '', metadata: '{}', content: '' },
     initial: { styles: '', metadata: '{}', content: '' },
-    tab: 'content'
+    tab: ContentType.CONTENT
   };
 
   @autobind
@@ -142,7 +141,11 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
   }
 
   public componentDidMount() {
-    const tabs: ContentType[] = ['content', 'styles', 'metadata'];
+    const tabs: ContentType[] = [
+      ContentType.CONTENT,
+      ContentType.STYLES,
+      ContentType.METADATA
+    ];
     listen('resize', this.handleResize);
     listen('keypress', e => {
       if (e.ctrlKey && e.code === 'Tab') {
@@ -169,13 +172,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         onMouseOver={this.focus}
       >
         <div className={`tabs ${this.state.tab}`}>
-          <button className="content" onClick={this.tab('content')}>
+          <button className="content" onClick={this.tab(ContentType.CONTENT)}>
             Content (Markdown)
           </button>
-          <button className="styles" onClick={this.tab('styles')}>
+          <button className="styles" onClick={this.tab(ContentType.STYLES)}>
             Styles (SCSS)
           </button>
-          <button className="metadata" onClick={this.tab('metadata')}>
+          <button className="metadata" onClick={this.tab(ContentType.METADATA)}>
             Metadata (JSON)
           </button>
         </div>

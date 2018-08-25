@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ContentType } from './editor';
+import { ContentType } from '../types';
 
 type ProblemsProps = {
   problems: Record<ContentType, string[]>;
@@ -9,34 +9,53 @@ type ProblemsState = {
   tab: ContentType;
 };
 
+const tabs: ContentType[] = [
+  ContentType.STYLES,
+  ContentType.CONTENT,
+  ContentType.METADATA
+];
+
+const styles = {
+  [ContentType.CONTENT]: {
+    color: '#818B92'
+  },
+  [ContentType.METADATA]: {
+    color: '#cbb2b2'
+  },
+  [ContentType.STYLES]: {
+    color: '#9FB69F'
+  }
+};
+
 export default class Problems extends React.Component<
   ProblemsProps,
   ProblemsState
 > {
-  public state: ProblemsState = { tab: 'content' };
+  public state: ProblemsState = { tab: ContentType.CONTENT };
+
+  public problems(tab: ContentType = this.state.tab): string[] {
+    return this.props.problems[tab] || [];
+  }
 
   public tab(tab: ContentType) {
     return () => this.setState({ tab });
   }
 
   public render() {
+    const problems = tabs.reduce(
+      (a, tab) => a.concat(this.problems(tab).map(str => ({ tab, str }))),
+      [] as Array<{ tab: ContentType; str: string }>
+    );
     return (
       <div>
-        <div className={`tabs ${this.state.tab}`}>
-          <button className="content" onClick={this.tab('content')}>
-            Content {this.props.problems.content.length ? '⚠️' : ''}
-          </button>
-          <button className="styles" onClick={this.tab('styles')}>
-            Styles {this.props.problems.styles.length ? '⚠️' : ''}
-          </button>
-          <button className="metadata" onClick={this.tab('metadata')}>
-            Metadata {this.props.problems.metadata.length ? '⚠️' : ''}
-          </button>
-        </div>
         <pre className="problems">
-          {this.props.problems[this.state.tab].map((problem, i) => (
-            <div key={i}>{problem}</div>
-          ))}
+          {problems.map(({ str, tab }) => {
+            return (
+              <p>
+                <span style={styles[tab]}>{tab}</span>: {str}
+              </p>
+            );
+          })}
         </pre>
       </div>
     );

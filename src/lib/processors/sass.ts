@@ -1,12 +1,12 @@
 // tslint:disable-next-line
 import * as Sass from 'sass.js/dist/sass.js';
 
-import { ContentType } from '../components/editor';
 import Processor, { ReporterFunction, SenderFunction } from '../processor';
 import sass from '../resolvers/scss';
+import { ContentType } from '../types';
 
 export default class SASSProcessor extends Processor {
-  public type: ContentType = 'styles';
+  public type: ContentType = ContentType.STYLES;
   protected scss: typeof Sass = new Sass();
 
   public constructor(

@@ -1,8 +1,8 @@
 import { parse, ParseError, ParseErrorCode } from 'jsonc-parser';
 import * as lc from 'line-column';
 
-import { ContentType } from '../components/editor';
 import Processor from '../processor';
+import { ContentType } from '../types';
 
 const ParseErrors = {
   [ParseErrorCode.InvalidSymbol]: 'Invalid symbol',
@@ -24,7 +24,7 @@ const ParseErrors = {
 };
 
 export default class JSONCProcessor extends Processor {
-  public type: ContentType = 'metadata';
+  public type: ContentType = ContentType.METADATA;
   public parsed: any = {};
   public async process(value: string) {
     const errors: ParseError[] = [];
