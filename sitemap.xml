@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url> <loc>https://getmarkwright.com/help</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/en/help" /> </url>
+<url> <loc>https://getmarkwright.com/index</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/en/index" /> </url>
+<url> <loc>https://getmarkwright.com/users</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/en/users" /> </url>
+<url> <loc>https://getmarkwright.com/versions</loc> <changefreq>weekly</changefreq> <priority>0.5</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/en/versions" /> </url>
+<url> <loc>https://getmarkwright.com/blog/2018/08/25/hello-world</loc> <changefreq>weekly</changefreq> <priority>0.3</priority> </url>
+<url> <loc>https://getmarkwright.com/docs/next/getting-started</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/getting-started" /> </url>
+<url> <loc>https://getmarkwright.com/docs/next/home</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/home" /> </url>
+<url> <loc>https://getmarkwright.com/docs/next/styling-intro</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/styling-intro" /> </url>
+<url> <loc>https://getmarkwright.com/docs/next/markdown</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/markdown" /> </url>
+<url> <loc>https://getmarkwright.com/docs/next/metadata</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/metadata" /> </url>
+<url> <loc>https://getmarkwright.com/docs/next/sass</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/next/sass" /> </url>
+<url> <loc>https://getmarkwright.com/docs/getting-started</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/getting-started" /> </url>
+<url> <loc>https://getmarkwright.com/docs/home</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/home" /> </url>
+<url> <loc>https://getmarkwright.com/docs/styling-intro</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/styling-intro" /> </url>
+<url> <loc>https://getmarkwright.com/docs/markdown</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/markdown" /> </url>
+<url> <loc>https://getmarkwright.com/docs/metadata</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/metadata" /> </url>
+<url> <loc>https://getmarkwright.com/docs/sass</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://getmarkwright.com/docs/sass" /> </url>
+</urlset>
