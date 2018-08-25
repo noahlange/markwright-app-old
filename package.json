@@ -19,7 +19,6 @@
     "lodash": "^4.17.10",
     "markwright": "noahlange/markwright",
     "monaco-editor": "^0.14.3",
-    "panzoom": "^6.0.1",
     "paper-size": "^1.1.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

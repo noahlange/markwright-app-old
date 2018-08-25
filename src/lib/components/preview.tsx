@@ -4,7 +4,6 @@ import * as sizes from 'paper-size';
 import * as React from 'react';
 import { proxy } from 'workly';
 
-import panzoom from 'panzoom';
 import * as markwright from '../../themes/markwright';
 import { listen, unlisten } from '../listen';
 
@@ -12,8 +11,7 @@ const {
   _home: home,
   _off: off,
   _on: on,
-  _send: send,
-  _session: session
+  _send: send
 } = window as any;
 
 type PreviewProps = {};
@@ -30,7 +28,6 @@ export default class Preview extends React.Component<
   public highlight = proxy('../lib/highlight.worker.js');
   public mouse = { x: 0, y: 0 };
   public scroller: HTMLDivElement | null = null;
-  public pz: typeof panzoom | any = null;
 
   public $hint: Record<string, HTMLElement | null> = {
     element: null,
@@ -95,12 +92,6 @@ export default class Preview extends React.Component<
     }
   }
 
-  public componentWillUnmount() {
-    if (this.pz) {
-      this.pz.dispose();
-    }
-  }
-
   public onError = (e: any) => {
     const target = e.nativeEvent.target;
     send('app.error', `Image not found: "${ target.src }".`)
@@ -115,26 +106,6 @@ export default class Preview extends React.Component<
     sizes.register('half-letter', 140, 216);
     this.setBase();
     send('app.ready');
-
-    this.pz = panzoom(this.scroller as any, {
-      autocenter: true,
-      beforeWheel: (e: any) => {
-        const stop = !e.altKey;
-        if (stop) {
-          if (e.shiftKey) {
-            this.pz.moveBy(-e.deltaX / 10, 0);
-          } else {
-            this.pz.moveBy(0, -e.deltaY / 10);
-          }
-          e.preventDefault();
-        }
-        return stop;
-      },
-      maxZoom: 2,
-      minZoom: 0.25,
-      smoothScroll: false,
-      zoomDoubleClickSpeed: 1
-    }) as any;
   }
 
   public render() {
@@ -145,9 +116,8 @@ export default class Preview extends React.Component<
           alignItems: 'center',
           display: 'flex',
           height: '100vh',
-          justifyContent: 'center',
-          paddingTop: '2.5rem',
-          width: '100vw'
+          // justifyContent: 'center',
+          width: '100vw',
         }}
       >
         <style type="text/css">{this.themeCSS}</style>

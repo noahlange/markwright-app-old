@@ -138,6 +138,7 @@ export function styles<T extends typeof defaults>(
       flex-direction: column;
       height: var(--page-height);
       width: var(--page-width);
+      margin-bottom: 1rem;
     }
     
     .odd .header,

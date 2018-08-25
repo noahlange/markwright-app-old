@@ -1,4 +1,4 @@
-import { ipcRenderer as ipc, session } from 'electron';
+import { ipcRenderer as ipc } from 'electron';
 import { homedir } from 'os';
 
 declare var window: any;
